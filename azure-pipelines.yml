@@ -7,7 +7,7 @@ trigger:
 - main
 
 pool:
-  vmImage: ubuntu-latest
+  name: diksha_pool
 
 steps:
 - task: NodeTool@0
