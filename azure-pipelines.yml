@@ -5,7 +5,7 @@ pool:
   name: diksha_pool
 
 steps:
-# Use clean checkout to avoid Git auth issues on public repo
+# Clean checkout to avoid auth issues and start fresh
 - checkout: self
   persistCredentials: false
   clean: true
@@ -16,19 +16,31 @@ steps:
     versionSpec: '20.x'
   displayName: 'Install Node.js'
 
-# Install dependencies and build project
+# Install dependencies and build
 - script: |
     npm install
     npm run build
   displayName: 'npm install and build'
 
+# Show contents of build folder (for debugging)
+- script: |
+    echo "Build folder contents:"
+    ls -la $(System.DefaultWorkingDirectory)/build
+  displayName: 'Debug: List build folder'
+
 # Copy build output to artifact staging directory
 - task: CopyFiles@2
   inputs:
-    SourceFolder: '$(System.DefaultWorkingDirectory)/build'  # Change to /dist if that's your build folder
+    SourceFolder: '$(System.DefaultWorkingDirectory)/build'
     Contents: '**/*'
     TargetFolder: '$(Build.ArtifactStagingDirectory)'
   displayName: 'Copy files to staging directory'
+
+# Show contents of staging directory (for debugging)
+- script: |
+    echo "Staging directory contents:"
+    ls -la $(Build.ArtifactStagingDirectory)
+  displayName: 'Debug: List staging folder'
 
 # Publish the artifact
 - task: PublishBuildArtifacts@1
@@ -38,14 +50,14 @@ steps:
     publishLocation: 'Container'
   displayName: 'Publish build artifacts'
 
-# Deploy to Azure Web App
+# Deploy to Azure Web App using the published artifact
 - task: AzureWebApp@1
   displayName: 'Deploy to Azure App Service'
   inputs:
     azureSubscription: 'demo-diksha'
     resourceGroupName: 'DikshaRG'
     appName: 'demo--app'
-    package: '$(Build.ArtifactStagingDirectory)'
+    package: '$(Pipeline.Workspace)/drop'
     appType: 'webAppLinux'
     runtimeStack: 'NODE|20-lts'
     deploymentMethod: 'auto'
