@@ -5,11 +5,18 @@ pool:
   name: diksha_pool
 
 steps:
+# Use clean checkout to avoid Git auth issues on public repo
+- checkout: self
+  persistCredentials: false
+  clean: true
+
+# Install Node.js
 - task: NodeTool@0
   inputs:
     versionSpec: '20.x'
   displayName: 'Install Node.js'
 
+# Install dependencies and build project
 - script: |
     npm install
     npm run build
@@ -18,7 +25,7 @@ steps:
 # Copy build output to artifact staging directory
 - task: CopyFiles@2
   inputs:
-    SourceFolder: '$(System.DefaultWorkingDirectory)/build'  # or dist, adjust based on your project
+    SourceFolder: '$(System.DefaultWorkingDirectory)/build'  # Change to /dist if that's your build folder
     Contents: '**/*'
     TargetFolder: '$(Build.ArtifactStagingDirectory)'
   displayName: 'Copy files to staging directory'
@@ -30,13 +37,15 @@ steps:
     ArtifactName: 'drop'
     publishLocation: 'Container'
   displayName: 'Publish build artifacts'
+
+# Deploy to Azure Web App
 - task: AzureWebApp@1
   displayName: 'Deploy to Azure App Service'
   inputs:
     azureSubscription: 'demo-diksha'
     resourceGroupName: 'DikshaRG'
     appName: 'demo--app'
-    package: '$(System.DefaultWorkingDirectory)/drop'
-    appType: 'webAppLinux'           # required for Linux Web Apps
+    package: '$(Build.ArtifactStagingDirectory)'
+    appType: 'webAppLinux'
     runtimeStack: 'NODE|20-lts'
     deploymentMethod: 'auto'
