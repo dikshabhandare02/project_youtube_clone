@@ -17,7 +17,6 @@ steps:
 
   # Node.js
 - task: PublishBuildArtifacts@1
-- task: DownloadBuildArtifacts@1
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'drop'
