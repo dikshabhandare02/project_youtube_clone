@@ -30,3 +30,13 @@ steps:
     ArtifactName: 'drop'
     publishLocation: 'Container'
   displayName: 'Publish build artifacts'
+- task: AzureWebApp@1
+  displayName: 'Deploy to Azure App Service'
+  inputs:
+    azureSubscription: 'demo-diksha'
+    resourceGroupName: 'DikshaRG'
+    appName: 'demo--app'
+    package: '$(System.DefaultWorkingDirectory)/drop'
+    appType: 'webAppLinux'           # required for Linux Web Apps
+    runtimeStack: 'NODE|20-lts'
+    deploymentMethod: 'auto'
