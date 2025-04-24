@@ -5,9 +5,8 @@ pool:
   name: diksha_pool
 
 steps:
-# Clean checkout to avoid auth issues and start fresh
+# Checkout the code
 - checkout: self
-  persistCredentials: false
   clean: true
 
 # Install Node.js
@@ -16,58 +15,38 @@ steps:
     versionSpec: '20.x'
   displayName: 'Install Node.js'
 
-# Install dependencies and build
+# Install dependencies and build the app
 - script: |
     npm install
     npm run build
   displayName: 'npm install and build'
 
-# Show contents of build folder (for debugging)
-- script: |
-    echo "Build folder contents:"
-    ls -la $(System.DefaultWorkingDirectory)/build
-  displayName: 'Debug: List build folder'
-
-# Copy build output to artifact staging directory
-- task: CopyFiles@2
-  inputs:
-    SourceFolder: '$(System.DefaultWorkingDirectory)/build'
-    Contents: '**/*'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)/drop'
-  displayName: 'Copy files to staging directory'
-
-# Show contents of staging directory (for debugging)
-- script: |
-    echo "Staging directory contents:"
-    ls -la $(Build.ArtifactStagingDirectory)/drop
-  displayName: 'Debug: List staging folder'
-
-# Archive the files into a .zip (required for deployment)
+# Archive the build output into a .zip file (needed for Azure Web App)
 - task: ArchiveFiles@2
   inputs:
-    rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/drop'
+    rootFolderOrFile: '$(System.DefaultWorkingDirectory)/build'
     includeRootFolder: false
     archiveType: 'zip'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/drop.zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/build.zip'
     replaceExistingArchive: true
-  displayName: 'Archive build output'
+  displayName: 'Archive build folder'
 
-# Publish the artifact
+# Publish the ZIP as an artifact
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)/drop.zip'
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/build.zip'
     ArtifactName: 'drop'
     publishLocation: 'Container'
-  displayName: 'Publish build artifacts'
+  displayName: 'Publish artifact'
 
-# Deploy to Azure Web App using the zip file
+# Deploy the ZIP to Azure Web App
 - task: AzureWebApp@1
-  displayName: 'Deploy to Azure App Service'
+  displayName: 'Deploy to Azure Web App'
   inputs:
     azureSubscription: 'demo-diksha'
     resourceGroupName: 'DikshaRG'
     appName: 'demo--app'
-    package: '$(Build.ArtifactStagingDirectory)/drop.zip'
+    package: '$(Build.ArtifactStagingDirectory)/build.zip'
     appType: 'webAppLinux'
     runtimeStack: 'NODE|20-lts'
     deploymentMethod: 'auto'
