@@ -57,7 +57,7 @@ steps:
     azureSubscription: 'demo-diksha'
     resourceGroupName: 'DikshaRG'
     appName: 'demo--app'
-    package: '$(Pipeline.Workspace)/drop'
+    package: '$(Build.ArtifactStagingDirectory)' 
     appType: 'webAppLinux'
     runtimeStack: 'NODE|20-lts'
     deploymentMethod: 'auto'
