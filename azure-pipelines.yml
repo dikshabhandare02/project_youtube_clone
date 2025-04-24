@@ -18,14 +18,14 @@ steps:
 
 # Install dependencies and build
 - script: |
-    npm install
+    npm ci
     npm run build
-  displayName: 'npm install and build'
+  displayName: 'Install dependencies and build'
 
-# Show contents of build folder (for debugging)
+# Debug: List build folder
 - script: |
     echo "Build folder contents:"
-    ls -la $(System.DefaultWorkingDirectory)/build
+    ls -la build
   displayName: 'Debug: List build folder'
 
 # Copy build output to artifact staging directory
@@ -36,7 +36,7 @@ steps:
     TargetFolder: '$(Build.ArtifactStagingDirectory)'
   displayName: 'Copy files to staging directory'
 
-# Show contents of staging directory (for debugging)
+# Debug: List artifact staging directory
 - script: |
     echo "Staging directory contents:"
     ls -la $(Build.ArtifactStagingDirectory)
@@ -50,7 +50,7 @@ steps:
     publishLocation: 'Container'
   displayName: 'Publish build artifacts'
 
-# Deploy to Azure Web App using the published artifact
+# Deploy to Azure Web App
 - task: AzureWebApp@1
   displayName: 'Deploy to Azure App Service'
   inputs:
