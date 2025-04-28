@@ -45,7 +45,7 @@ steps:
   inputs:
     azureSubscription: 'demo-diksha'
     resourceGroupName: 'DikshaRG'
-    appName: 'demo--app'
+    appName: 'youtubeapp'
     package: '$(Build.ArtifactStagingDirectory)/build.zip'        # Update to build.zip
     appType: 'webAppLinux'
     runtimeStack: 'NODE|20-lts'
