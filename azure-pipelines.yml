@@ -21,20 +21,20 @@ steps:
     npm run build
   displayName: 'npm install and build'
 
-# Archive the build output into a .zip file (needed for Azure Web App)
+# Archive the build output (dist folder for Vite apps)
 - task: ArchiveFiles@2
   inputs:
-    rootFolderOrFile: '$(System.DefaultWorkingDirectory)/build'
+    rootFolderOrFile: '$(System.DefaultWorkingDirectory)/dist'   # <---- changed build -> dist
     includeRootFolder: true
     archiveType: 'zip'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/build.zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/dist.zip'     # <---- changed filename
     replaceExistingArchive: true
-  displayName: 'Archive build folder'
+  displayName: 'Archive dist folder'
 
 # Publish the ZIP as an artifact
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)/build.zip'
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/dist.zip'
     ArtifactName: 'drop'
     publishLocation: 'Container'
   displayName: 'Publish artifact'
@@ -45,8 +45,8 @@ steps:
   inputs:
     azureSubscription: 'demo-diksha'
     resourceGroupName: 'DikshaRG'
-    appName: 'demo--app'
-    package: '$(Build.ArtifactStagingDirectory)/build.zip'
+    appName: 'youtubeapp'
+    package: '$(Build.ArtifactStagingDirectory)/dist.zip'        # <---- updated path
     appType: 'webAppLinux'
     runtimeStack: 'NODE|20-lts'
     deploymentMethod: 'auto'
