@@ -21,14 +21,14 @@ steps:
   displayName: 'Install Node.js'
 
 # Add staticwebapp.config.json for React Router support
-- script: |
-    echo ^{
-    echo   "navigationFallback": {
-    echo     "rewrite": "/index.html",
-    echo     "exclude": ["/static/*"]
-    echo   }
-    echo ^} > public/staticwebapp.config.json
-  displayName: 'Create staticwebapp.config.json'
+#- script: |
+#    echo ^{
+#    echo   "navigationFallback": {
+#    echo     "rewrite": "/index.html",
+#    echo     "exclude": ["/static/*"]
+#    echo   }
+#    echo ^} > public/staticwebapp.config.json
+#  displayName: 'Create staticwebapp.config.json'
 
 # Install dependencies and build the React app
 - script: |
