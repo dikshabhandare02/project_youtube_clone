@@ -2,7 +2,7 @@ trigger:
 - main
 
 pool:
-  name: diksha_pool  # Self-hosted agent, or use 'vmImage' if Microsoft-hosted
+  name: diksha_pool  # Self-hosted agent
 
 variables:
   buildDir: '$(System.DefaultWorkingDirectory)/build'
@@ -19,6 +19,16 @@ steps:
   inputs:
     versionSpec: '20.x'
   displayName: 'Install Node.js'
+
+# Add staticwebapp.config.json for React Router support
+- script: |
+    echo ^{
+    echo   "navigationFallback": {
+    echo     "rewrite": "/index.html",
+    echo     "exclude": ["/static/*"]
+    echo   }
+    echo ^} > public/staticwebapp.config.json
+  displayName: 'Create staticwebapp.config.json'
 
 # Install dependencies and build the React app
 - script: |
@@ -48,8 +58,8 @@ steps:
 - task: AzureWebApp@1
   displayName: 'Deploy to Azure Web App'
   inputs:
-    azureSubscription: 'demo-diksha'  # Replace with your service connection name
-    appName: 'youtubeapp'             # Replace with your Web App name
+    azureSubscription: 'demo-diksha'
+    appName: 'youtubeapp'
     package: '$(zipPath)'
     appType: 'webAppLinux'
     runtimeStack: 'NODE|20-lts'
