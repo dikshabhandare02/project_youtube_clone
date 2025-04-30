@@ -7,7 +7,7 @@ pool:
 variables:
   buildDir: '$(System.DefaultWorkingDirectory)/build'
   artifactName: 'drop'
-  zipPath: '$(Build.ArtifactStagingDirectory)/build.zip'
+  # zipPath: '$(Build.ArtifactStagingDirectory)/build.zip'
 
 steps:
 # Checkout code
@@ -37,30 +37,36 @@ steps:
   displayName: 'npm install and build'
 
 # Archive the build output
-- task: ArchiveFiles@2
-  inputs:
-    rootFolderOrFile: '$(buildDir)'
-    includeRootFolder: false
-    archiveType: 'zip'
-    archiveFile: '$(zipPath)'
-    replaceExistingArchive: true
-  displayName: 'Archive React build folder'
+# - task: ArchiveFiles@2
+#   inputs:
+#     rootFolderOrFile: '$(buildDir)'
+#     includeRootFolder: false
+#     archiveType: 'zip'
+#     archiveFile: '$(zipPath)'
+#     replaceExistingArchive: true
+#   displayName: 'Archive React build folder'
 
 # Publish the ZIP as an artifact
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '$(zipPath)'
-    ArtifactName: '$(artifactName)'
-    publishLocation: 'Container'
-  displayName: 'Publish artifact'
+# - task: PublishBuildArtifacts@1
+#   inputs:
+#     PathtoPublish: '$(zipPath)'
+#     ArtifactName: '$(artifactName)'
+#     publishLocation: 'Container'
+#   displayName: 'Publish artifact'
 
 # Deploy the ZIP to Azure Web App
-- task: AzureWebApp@1
-  displayName: 'Deploy to Azure Web App'
+# - task: AzureWebApp@1
+#   displayName: 'Deploy to Azure Web App'
+#   inputs:
+#     azureSubscription: 'demo-diksha'
+#     appName: 'youtubeapp'
+#     package: '$(zipPath)'
+#     appType: 'webAppLinux'
+#     runtimeStack: 'NODE|20-lts'
+#     deploymentMethod: 'zipDeploy'
+
+- task: AzureStaticWebApp@0
   inputs:
-    azureSubscription: 'demo-diksha'
-    appName: 'youtubeapp'
-    package: '$(zipPath)'
-    appType: 'webAppLinux'
-    runtimeStack: 'NODE|20-lts'
-    deploymentMethod: 'zipDeploy'
+    app_location: '/'
+    output_location: '$(buildDir)'
+    azure_static_web_apps_api_token: '5716439592c9ef64c57a24f57bf618b9398c8b6d0b56b8e8438826a49705efdd06-5a2ac5a9-ac15-49d6-8d7f-a6c6e459cd9c00012160aa19b400'
