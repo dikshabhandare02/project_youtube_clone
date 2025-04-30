@@ -2,10 +2,15 @@ trigger:
 - main
 
 pool:
-  name: diksha_pool
+  name: diksha_pool  # Self-hosted agent, or use 'vmImage' if Microsoft-hosted
+
+variables:
+  buildDir: '$(System.DefaultWorkingDirectory)/build'
+  artifactName: 'drop'
+  zipPath: '$(Build.ArtifactStagingDirectory)/build.zip'
 
 steps:
-# Checkout the code
+# Checkout code
 - checkout: self
   clean: true
 
@@ -15,27 +20,27 @@ steps:
     versionSpec: '20.x'
   displayName: 'Install Node.js'
 
-# Install dependencies and build the app
+# Install dependencies and build the React app
 - script: |
     npm install
     npm run build
   displayName: 'npm install and build'
 
-# Archive the build output (build folder for React apps)
+# Archive the build output
 - task: ArchiveFiles@2
   inputs:
-    rootFolderOrFile: '$(System.DefaultWorkingDirectory)/build'   # Change to 'build'
-    includeRootFolder: true
+    rootFolderOrFile: '$(buildDir)'
+    includeRootFolder: false
     archiveType: 'zip'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/build.zip'     # Change to 'build.zip'
+    archiveFile: '$(zipPath)'
     replaceExistingArchive: true
-  displayName: 'Archive build folder'
+  displayName: 'Archive React build folder'
 
 # Publish the ZIP as an artifact
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)/build.zip'
-    ArtifactName: 'drop'
+    PathtoPublish: '$(zipPath)'
+    ArtifactName: '$(artifactName)'
     publishLocation: 'Container'
   displayName: 'Publish artifact'
 
@@ -43,10 +48,9 @@ steps:
 - task: AzureWebApp@1
   displayName: 'Deploy to Azure Web App'
   inputs:
-    azureSubscription: 'demo-diksha'
-    resourceGroupName: 'DikshaRG'
-    appName: 'youtubeapp'
-    package: '$(Build.ArtifactStagingDirectory)/build.zip'        # Update to build.zip
+    azureSubscription: 'demo-diksha'  # Replace with your service connection name
+    appName: 'youtubeapp'             # Replace with your Web App name
+    package: '$(zipPath)'
     appType: 'webAppLinux'
     runtimeStack: 'NODE|20-lts'
-    deploymentMethod: 'auto'
+    deploymentMethod: 'zipDeploy'
