@@ -68,5 +68,5 @@ steps:
 - task: AzureStaticWebApp@0
   inputs:
     app_location: '/'
-    output_location: '$(buildDir)'
+    output_location: 'build'
     azure_static_web_apps_api_token: '5716439592c9ef64c57a24f57bf618b9398c8b6d0b56b8e8438826a49705efdd06-5a2ac5a9-ac15-49d6-8d7f-a6c6e459cd9c00012160aa19b400'
